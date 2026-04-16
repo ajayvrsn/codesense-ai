@@ -1,0 +1,5 @@
+{
+  "name": "CodeSense AI",
+  "description": "Production-grade AI Code Reviewer with real-time analysis, security detection, and interactive diff visualization.",
+  "requestFramePermissions": []
+}
