@@ -29,8 +29,35 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as diff from 'diff';
 import { cn } from './lib/utils';
-import { analyzeCode, debugCode, ReviewResult, CodeIssue } from './services/geminiService';
+import { ReviewResult, CodeIssue } from './services/geminiService';
 import { AuthForm } from './components/auth/AuthForm';
+
+// Helper functions to call the API endpoints
+const analyzeCode = async (code: string, fileName: string): Promise<ReviewResult> => {
+  const response = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, fileName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to analyze code');
+  }
+  return response.json();
+};
+
+const debugCode = async (code: string, fileName: string): Promise<ReviewResult> => {
+  const response = await fetch('/api/debug', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, fileName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to debug code');
+  }
+  return response.json();
+};
 
 // --- Types ---
 

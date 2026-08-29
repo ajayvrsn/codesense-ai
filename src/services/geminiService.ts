@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const apiKey = (process.env.GEMINI_API_KEY || "").trim().replace(/^["']|["']$/g, "").trim();
+const ai = new GoogleGenAI({ apiKey });
 
 export interface CodeIssue {
   line: number;
@@ -18,7 +19,7 @@ export interface ReviewResult {
 }
 
 export async function analyzeCode(code: string, fileName: string): Promise<ReviewResult> {
-  const model = "gemini-1.5-flash";
+  const model = "gemini-3.6-flash";
   
   const prompt = `
     You are a senior software engineer and security expert. 
@@ -79,7 +80,7 @@ export async function analyzeCode(code: string, fileName: string): Promise<Revie
 }
 
 export async function debugCode(code: string, fileName: string): Promise<ReviewResult> {
-  const model = "gemini-1.5-flash";
+  const model = "gemini-3.6-flash";
   
   const prompt = `
     You are a world-class debugger and software engineer. 

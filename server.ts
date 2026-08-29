@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { initDb, query } from "./db.js";
+import { analyzeCode, debugCode } from "./src/services/geminiService.js";
 
 dotenv.config();
 
@@ -252,6 +253,35 @@ async function startServer() {
     } catch (err) {
       console.error(err);
       res.status(500).send("OAuth failed");
+    }
+  });
+
+  // --- Gemini API Routes ---
+  app.post("/api/analyze", authenticateToken, async (req: any, res) => {
+    try {
+      const { code, fileName } = req.body;
+      if (!code || !fileName) {
+        return res.status(400).json({ error: "Missing code or fileName" });
+      }
+      const result = await analyzeCode(code, fileName);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze code. Please check your API key." });
+    }
+  });
+
+  app.post("/api/debug", authenticateToken, async (req: any, res) => {
+    try {
+      const { code, fileName } = req.body;
+      if (!code || !fileName) {
+        return res.status(400).json({ error: "Missing code or fileName" });
+      }
+      const result = await debugCode(code, fileName);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Debug error:", error);
+      res.status(500).json({ error: "Failed to debug code. Please check your API key." });
     }
   });
 
