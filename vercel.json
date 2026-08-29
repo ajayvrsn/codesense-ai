@@ -1,29 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "dist/index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "dist/server.js"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "dist/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/$1"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
   }
