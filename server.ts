@@ -300,9 +300,12 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  return app;
 }
 
-startServer();
+// For development: start the server
+if (process.env.NODE_ENV !== "production") {
+  startServer();
+}
+
+export default startServer;
