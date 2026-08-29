@@ -23,7 +23,7 @@ if (!process.env.APP_URL) {
   console.warn("WARNING: APP_URL is not set. This is required for OAuth redirects to work correctly.");
 }
 
-async function startServer() {
+async function createApp() {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
@@ -303,9 +303,19 @@ async function startServer() {
   return app;
 }
 
-// For development: start the server
-if (process.env.NODE_ENV !== "production") {
-  startServer();
+// For development: create and start listening
+async function startServer() {
+  const app = await createApp();
+  const PORT = Number(process.env.PORT) || 3000;
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 }
 
-export default startServer;
+// For Vercel: export the app creator
+export default createApp;
+
+// Start in development mode
+if (process.env.NODE_ENV !== "production") {
+  startServer().catch(console.error);
+}
