@@ -784,7 +784,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-6">
             <span className="hover:text-slate-300 cursor-default transition-colors">UTF-8</span>
-            <span className="hover:text-slate-300 cursor-default transition-colors">Gemini 3 Flash</span>
+            <span className="hover:text-slate-300 cursor-default transition-colors">Gemini 3.6 Flash</span>
           </div>
         </div>
       </main>
