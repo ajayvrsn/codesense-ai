@@ -1,6 +1,6 @@
-# CodeSense AI
+# Debugr
 
-CodeSense AI is a professional code analysis and debugging platform powered by Gemini 1.5. It provides real-time analysis for security vulnerabilities, performance bottlenecks, and logic errors with interactive diff visualizations.
+Debugr is a professional code analysis and debugging platform powered by Gemini. It provides real-time analysis for security vulnerabilities, performance bottlenecks, and logic errors with interactive diff visualizations.
 
 ## Features
 
@@ -22,8 +22,8 @@ CodeSense AI is a professional code analysis and debugging platform powered by G
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/codesense-ai.git
-   cd codesense-ai
+   git clone https://github.com/your-username/debugr.git
+   cd debugr
    ```
 
 2. Install dependencies:

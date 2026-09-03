@@ -216,7 +216,7 @@ const Sidebar = ({
           <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <Code2 size={20} className="text-white" />
           </div>
-          <span className="font-bold text-slate-100 tracking-tight text-lg">CodeSense</span>
+          <span className="font-bold text-slate-100 tracking-tight text-lg">Debugr</span>
         </div>
       </div>
 
@@ -600,7 +600,7 @@ export default function App() {
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-500/20 mx-auto mb-6">
             <Code2 size={40} className="text-white" />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-display font-bold text-white tracking-tight mb-3">CodeSense AI</h1>
+          <h1 className="text-4xl sm:text-5xl font-display font-bold text-white tracking-tight mb-3">Debugr</h1>
           <p className="text-slate-500 font-medium text-base sm:text-lg">The next generation of code analysis</p>
         </div>
         <AuthForm 

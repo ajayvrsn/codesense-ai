@@ -1,6 +1,6 @@
-# Contributing to CodeSense AI
+# Contributing to Debugr
 
-Thank you for your interest in contributing to CodeSense AI! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to Debugr! This document provides guidelines and instructions for contributing to the project.
 
 ## Code of Conduct
 
@@ -9,7 +9,7 @@ This project is committed to providing a welcoming and inclusive environment for
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/your-username/codesense-ai.git`
+2. Clone your fork: `git clone https://github.com/your-username/debugr.git`
 3. Create a branch: `git checkout -b feature/your-feature-name`
 4. Install dependencies: `npm install`
 
