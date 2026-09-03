@@ -76,6 +76,15 @@ async function createApp() {
     });
   };
 
+  const getCookieOptions = (req: any) => {
+    const isSecure = req.secure || req.get("x-forwarded-proto") === "https";
+    return {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: isSecure ? "none" as const : "lax" as const,
+    };
+  };
+
   // --- Auth API Routes ---
 
   // Register
@@ -94,11 +103,7 @@ async function createApp() {
       const user = result.rows[0];
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
+      res.cookie("token", token, getCookieOptions(req));
       res.json({ user });
     } catch (err: any) {
       if (err.code === "23505") {
@@ -130,11 +135,7 @@ async function createApp() {
       }
 
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
+      res.cookie("token", token, getCookieOptions(req));
       res.json({ user: { id: user.id, name: user.name, email: user.email } });
     } catch (err) {
       console.error(err);
@@ -144,17 +145,19 @@ async function createApp() {
 
   // Logout
   app.post("/api/auth/logout", (req, res) => {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+    res.clearCookie("token", getCookieOptions(req));
     res.json({ message: "Logged out" });
   });
 
   // Get current user
-  app.get("/api/auth/me", authenticateToken, (req: any, res) => {
-    res.json({ user: req.user });
+  app.get("/api/auth/me", (req: any, res) => {
+    const token = req.cookies.token;
+    if (!token) return res.json({ user: null });
+
+    jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+      if (err) return res.json({ user: null });
+      res.json({ user });
+    });
   });
 
   // --- OAuth API Routes (Google) ---
@@ -176,18 +179,27 @@ async function createApp() {
   };
 
   app.get("/api/auth/external/url", (req, res) => {
-    const redirectUri = getRedirectUri(req);
-    console.log(`[OAuth Debug] Generating Auth URL with redirect_uri: ${redirectUri}`);
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: redirectUri,
-      response_type: "code",
-      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-      access_type: "offline",
-      prompt: "consent",
-    });
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-    res.json({ url: authUrl });
+    try {
+      if (!GOOGLE_CLIENT_ID) {
+        return res.status(500).json({ error: "Google OAuth is not configured on the server" });
+      }
+
+      const redirectUri = getRedirectUri(req);
+      console.log(`[OAuth Debug] Generating Auth URL with redirect_uri: ${redirectUri}`);
+      const params = new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+        access_type: "offline",
+        prompt: "consent",
+      });
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+      return res.json({ url: authUrl });
+    } catch (err) {
+      console.error("OAuth URL error:", err);
+      return res.status(500).json({ error: "Unable to initialize Google login" });
+    }
   });
 
   app.get(["/auth/callback", "/auth/callback/"], async (req, res) => {
@@ -229,11 +241,7 @@ async function createApp() {
       }
 
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
+      res.cookie("token", token, getCookieOptions(req));
 
       res.send(`
         <html>
@@ -267,7 +275,7 @@ async function createApp() {
       res.json(result);
     } catch (error: any) {
       console.error("Analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze code. Please check your API key." });
+      res.status(502).json({ error: "Code analysis service is unavailable. Check the Gemini API configuration." });
     }
   });
 
@@ -281,7 +289,7 @@ async function createApp() {
       res.json(result);
     } catch (error: any) {
       console.error("Debug error:", error);
-      res.status(500).json({ error: "Failed to debug code. Please check your API key." });
+      res.status(502).json({ error: "Debug service is unavailable. Check the Gemini API configuration." });
     }
   });
 

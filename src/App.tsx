@@ -40,7 +40,13 @@ const analyzeCode = async (code: string, fileName: string): Promise<ReviewResult
     body: JSON.stringify({ code, fileName }),
   });
   if (!response.ok) {
-    const error = await response.json();
+    const text = await response.text();
+    let error: { error?: string } = {};
+    try {
+      error = text ? JSON.parse(text) : {};
+    } catch {
+      error.error = text;
+    }
     throw new Error(error.error || 'Failed to analyze code');
   }
   return response.json();
@@ -53,7 +59,13 @@ const debugCode = async (code: string, fileName: string): Promise<ReviewResult> 
     body: JSON.stringify({ code, fileName }),
   });
   if (!response.ok) {
-    const error = await response.json();
+    const text = await response.text();
+    let error: { error?: string } = {};
+    try {
+      error = text ? JSON.parse(text) : {};
+    } catch {
+      error.error = text;
+    }
     throw new Error(error.error || 'Failed to debug code');
   }
   return response.json();
@@ -480,7 +492,14 @@ export default function App() {
   // Check auth on mount
   useEffect(() => {
     fetch('/api/auth/me')
-      .then(res => res.json())
+      .then(async res => {
+        const text = await res.text();
+        try {
+          return text ? JSON.parse(text) : {};
+        } catch {
+          return {};
+        }
+      })
       .then(data => {
         if (data.user) setUser(data.user);
       })
@@ -543,7 +562,7 @@ export default function App() {
       setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, review: result, isAnalyzing: false } : f));
     } catch (error) {
       setFiles(prev => prev.map(f => f.id === activeFileId ? { ...f, isAnalyzing: false } : f));
-      alert("Failed to analyze code. Please check your API key.");
+      alert(error instanceof Error ? error.message : "Failed to analyze code.");
     }
   };
 

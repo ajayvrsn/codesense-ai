@@ -1,16 +1,19 @@
-import createApp from "../dist/server.js";
-
 let app;
+let appPromise;
 
 export default async (req, res) => {
   try {
-    if (!app) {
+    if (!appPromise) {
       console.log("Initializing app...");
-      app = await createApp();
+      appPromise = import("../dist/server.js").then(({ default: createApp }) => createApp());
     }
+    app = await appPromise;
     return app(req, res);
   } catch (error) {
     console.error("Server error:", error);
-    res.status(500).json({ error: error.message });
+    appPromise = undefined;
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Server initialization failed" });
+    }
   }
 };

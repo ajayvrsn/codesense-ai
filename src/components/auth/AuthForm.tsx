@@ -3,6 +3,15 @@ import { motion } from 'motion/react';
 import { Mail, Lock, User, ArrowRight, Loader2, Chrome } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+const readResponse = async (response: Response) => {
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    return { error: text || `Server error: ${response.status}` };
+  }
+};
+
 interface AuthFormProps {
   mode: 'login' | 'register';
   onSuccess: (user: any) => void;
@@ -28,7 +37,7 @@ export const AuthForm = ({ mode, onSuccess, onToggleMode }: AuthFormProps) => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const data = await readResponse(response);
       if (!response.ok) throw new Error(data.error || 'Authentication failed');
       
       onSuccess(data.user);
@@ -45,11 +54,11 @@ export const AuthForm = ({ mode, onSuccess, onToggleMode }: AuthFormProps) => {
     try {
       const response = await fetch('/api/auth/external/url');
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to get auth URL' }));
+        const errorData = await readResponse(response);
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
       
-      const { url } = await response.json();
+      const { url } = await readResponse(response);
       
       const authWindow = window.open(url, 'google_auth', 'width=600,height=700');
       
@@ -69,7 +78,7 @@ export const AuthForm = ({ mode, onSuccess, onToggleMode }: AuthFormProps) => {
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
         // Fetch user data after successful OAuth
         fetch('/api/auth/me')
-          .then(res => res.json())
+          .then(readResponse)
           .then(data => {
             if (data.user) onSuccess(data.user);
           });
