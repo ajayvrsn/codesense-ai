@@ -15,6 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = Number(process.env.PORT) || 3000;
+const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 const JWT_SECRET = (process.env.JWT_SECRET || "fallback-secret").trim().replace(/^["']|["']$/g, "").trim();
 const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || "").trim().replace(/^["']|["']$/g, "").trim();
 const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || "").trim().replace(/^["']|["']$/g, "").trim();
@@ -294,7 +295,7 @@ async function createApp() {
   });
 
   // --- Vite Middleware ---
-  if (process.env.NODE_ENV !== "production") {
+  if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -324,6 +325,6 @@ async function startServer() {
 export default createApp;
 
 // Start in development mode
-if (process.env.NODE_ENV !== "production") {
+if (!isProduction) {
   startServer().catch(console.error);
 }

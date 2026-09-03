@@ -2,9 +2,18 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": ["dist/server.js"]
+    }
+  },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/auth/callback",
+      "destination": "/api"
+    },
+    {
+      "source": "/auth/callback/",
       "destination": "/api"
     }
   ]
